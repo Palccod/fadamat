@@ -1,6 +1,11 @@
 import 'package:fadamat/constants.dart';
 import 'package:fadamat/responsive.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../../controllers/ble_controller.dart';
+import '../../../models/reading.dart';
+import '../../../services/isar_service.dart';
 
 class YourInfo extends StatefulWidget {
   const YourInfo({super.key});
@@ -27,19 +32,35 @@ class _YourInfoState extends State<YourInfo> {
     super.dispose();
   }
 
-  void _onAddNew() {
-    if (_formKey.currentState!.validate() &&
-        _selectedCrop != null &&
-        _selectedSoil != null) {
-      // Handle form submission here
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Form submitted!')));
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Please fill all fields')));
+  void _onAddNew() async {
+    final name = _nameController.text;
+    final phone = _phoneController.text;
+    final crop = _selectedCrop;
+    final soil = _selectedSoil;
+
+    if (_formKey.currentState!.validate() && crop != null && soil != null) {
+      // 1. Send crop and soil to BLE
+      await context.read<BleController>().sendCropAndSoil(crop, soil);
+
+      // 2. Save to Isar
+      final reading =
+          Reading()
+            ..name = name
+            ..phone = phone
+            ..crop = crop
+            ..soil = soil
+            ..date = DateTime.now();
+      await IsarService.addReading(reading);
+
+      // 3. Clear the form after successful submission
+      _nameController.clear();
+      _phoneController.clear();
+      setState(() {
+        _selectedCrop = null;
+        _selectedSoil = null;
+      });
     }
+    // No SnackBar or pop-up for incomplete or sent form
   }
 
   @override

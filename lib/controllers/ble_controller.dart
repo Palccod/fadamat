@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -20,8 +21,7 @@ class BleController extends ChangeNotifier {
     // Check if Bluetooth is on
     final state = await FlutterBluePlus.adapterState.first;
     if (state != BluetoothAdapterState.on) {
-      await FlutterBluePlus.turnOn(); // This will prompt the user to enable Bluetooth
-      // Wait for Bluetooth to turn on
+      await FlutterBluePlus.turnOn();
       await FlutterBluePlus.adapterState.firstWhere(
         (s) => s == BluetoothAdapterState.on,
       );
@@ -55,5 +55,13 @@ class BleController extends ChangeNotifier {
     _device = null;
     _deviceState = BluetoothConnectionState.disconnected;
     notifyListeners();
+  }
+
+  Future<void> sendCropAndSoil(String crop, String soil) async {
+    // Format your data as needed for your BLE device
+    final data = "$crop,$soil";
+    // TODO: Write data to the BLE characteristic
+    // Example:
+    // await yourBleCharacteristic.write(utf8.encode(data));
   }
 }

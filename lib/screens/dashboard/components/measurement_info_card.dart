@@ -9,10 +9,10 @@ class MeasurementInfoCard extends StatelessWidget {
     required this.title,
     required this.svgSrc,
     required this.value,
-    required this.format,
+    required this.unit,
   });
 
-  final String title, svgSrc, format;
+  final String title, svgSrc, unit;
   final double value;
 
   @override
@@ -44,7 +44,7 @@ class MeasurementInfoCard extends StatelessWidget {
                     style: TextStyle(fontSize: 13),
                   ),
                   Text(
-                    "($format)",
+                    "($unit)",
                     style: Theme.of(
                       context,
                     ).textTheme.bodySmall?.copyWith(color: Colors.white70),
